@@ -23,7 +23,7 @@ function open(name)
     end
 end
 
---- Open Microsoft Edge Tab
+--- Open Microsoft Edge New Tab
 function open_NewTab(name)
     return function()
         local browser = hs.appfinder.appFromName("Microsoft Edge")
@@ -42,6 +42,18 @@ function open_NewTab(name)
     end
 end
 
+--- Open Microsoft Edge New Window
+function open_NewWindow(name)
+    return function()
+        local browser = hs.appfinder.appFromName("Microsoft Edge")
+        local str_menu_item = { "File", "New Window" }
+        local menu_item = browser:findMenuItem(str_menu_item)
+        if (menu_item) then
+            browser:selectMenuItem(str_menu_item)
+        end
+    end
+end
+
 hs.hotkey.bind({ "cmd" }, "E", open("Finder"))
 hs.hotkey.bind({ "cmd" }, "Y", open("Youtube"))
 hs.hotkey.bind({ "cmd" }, "T", open("Google Translate"))
@@ -52,4 +64,5 @@ hs.hotkey.bind({ "cmd" }, "K", open("Google Keep"))
 hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
 hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
 hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
-hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
+--hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
+hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
