@@ -64,22 +64,6 @@ function open_NewTab(name)
         if (menu_item) then
             browser:selectMenuItem(str_menu_item)
         end
-
-        --hs.alert.show( hs.application.frontmostApplication():name())
-        --local curr_win_name = hs.application.frontmostApplication():name()
-        --hs.alert.show(curr_win_name)
-
-        --if curr_win_name == "YouTube" or
-        --        curr_win_name == "Google Maps"  or
-        --        curr_win_name == "Toledo"
-        --    then
-        --    hs.application.frontmostApplication():hide()
-        --
-        --    --hs.application.find('YouTube'):hide()
-        --    --hs.alert.show('AppName is still running')
-        --end
-
-        --hs.alert.show(curr_win_name:sub(-14))
         if curr_win_name:sub(-14) ~= "Microsoft Edge" then
             hs.application.frontmostApplication():hide()
         end
