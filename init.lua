@@ -26,8 +26,9 @@ end
 --- Open Microsoft Edge New Tab
 function open_NewTab(name)
     return function()
-        hs.appfinder.appFromName(name):activate()
+        -- hs.appfinder.appFromName(name):activate()
         local browser = hs.appfinder.appFromName(name)
+        browser:activate()
         local str_menu_item = { "File", "New Tab" }
         local menu_item = browser:findMenuItem(str_menu_item)
         if (menu_item) then
@@ -35,18 +36,6 @@ function open_NewTab(name)
             --hs.alert.show(hs.application.frontmostApplication():name())
         end
 
-        --local curr_win_name = hs.application.frontmostApplication():name()
-        --hs.alert.show(curr_win_name)
-        --if curr_win_name:sub(-14) ~= "Microsoft Edge" then
-        --    hs.application.frontmostApplication():hide()
-        --end
-
-        --hs.timer.doAfter(0.5, function()
-        --    local curr_win_name = hs.application.frontmostApplication():name()
-        --    if curr_win_name:sub(-14) ~= "Microsoft Edge" then
-        --        hs.application.frontmostApplication():hide()
-        --    end
-        --end)
     end
 end
 
