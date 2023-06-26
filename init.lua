@@ -26,7 +26,6 @@ end
 --- Open Microsoft Edge New Tab
 function open_NewTab(name)
     return function()
-        -- hs.appfinder.appFromName(name):activate()
         local browser = hs.appfinder.appFromName(name)
         browser:activate()
         local str_menu_item = { "File", "New Tab" }
@@ -43,6 +42,7 @@ end
 function open_NewWindow(name)
     return function()
         local browser = hs.appfinder.appFromName(name)
+        browser:activate()
         local str_menu_item = { "File", "New Window" }
         local menu_item = browser:findMenuItem(str_menu_item)
         if (menu_item) then
@@ -63,7 +63,9 @@ local URL = "https://github.com/danilotpnta?tab=repositories"
 hs.hotkey.bind({ "cmd" }, "E", open("Finder"))
 hs.hotkey.bind({ "cmd" }, "Y", open("Youtube"))
 hs.hotkey.bind({ "cmd" }, "T", open("Google Translate"))
-hs.hotkey.bind({ "cmd", }, "D", open("Google Drive"))
+hs.hotkey.bind({ "cmd","⌥" }, "D", open("Google Docs"))
+hs.hotkey.bind({ "cmd","⌥" }, "S", open("Google Sheets"))
+hs.hotkey.bind({ "cmd" }, "D", open("Google Drive"))
 hs.hotkey.bind({ "cmd" }, "1", open_url(URL))
 hs.hotkey.bind({ "cmd" }, "2", open("Gmail Danilo"))
 hs.hotkey.bind({ "cmd" }, "3", open("Microsoft Outlook"))
@@ -72,5 +74,5 @@ hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
 hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
 hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
 hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
---hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
+-- hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
 
