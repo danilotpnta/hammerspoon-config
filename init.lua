@@ -13,15 +13,103 @@ end
 hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 hs.alert.show("New changes applied")
 
+
+--- Safari counter 
+-- hs.alert.show( hs.window:tabCount())
+
+
 --- Open App
 function open(name)
     return function()
-        hs.application.launchOrFocus(name)
+        -- hs.application.launchOrFocus(name)
         if name == 'Finder' then
             hs.appfinder.appFromName(name):activate()
         end
+        if name == 'Safari' then
+            -- -- local browser = hs.appfinder.appFromName(name)
+            -- hs.application.launchOrFocus(name)
+            -- local focus_window =  hs.window.focusedWindow()
+            -- local focus_window_id = focus_window:id()
+            -- -- browser:activate()
+            -- hs.alert.show(focus_window:title())
+            -- -- hs.alert.show(focus_window_id)
+            -- hs.alert.show(focus_window:tabCount())
+
+            -- opening Tab
+            local browser = hs.appfinder.appFromName(name)
+            browser:activate()
+            local str_menu_item = { "File", "New Tab" }
+            local menu_item = browser:findMenuItem(str_menu_item)
+            if (menu_item) then
+                browser:selectMenuItem(str_menu_item)
+            end
+
+
+            local focus_window =  hs.window.focusedWindow()
+            local focus_window_id = focus_window:id()
+            hs.alert.show(focus_window_id)
+            hs.alert.show(focus_window:tabCount())
+
+        end
+
     end
 end
+
+
+function close(name)
+    return function()
+
+        function tprint (tbl, indent)
+            if not indent then indent = 0 end
+            for k, v in pairs(tbl) do
+              formatting = string.rep("  ", indent) .. k .. ": "
+              if type(v) == "table" then
+                print(formatting)
+                tprint(v, indent+1)
+              elseif type(v) == 'boolean' then
+                print(formatting .. tostring(v))      
+              else
+                print(formatting .. v)
+              end
+            end
+          end
+
+        local browser = hs.appfinder.appFromName(name)
+        local str_menu_item = { "File", "Close Tab" }
+        local menu_item = { "File", "Close Window" }
+
+        local menu_item = browser:findMenuItem(str_menu_item)
+        -- if (menu_item) then
+        --     hs.alert.show('Here if')
+        --     local tabWins = hs.tabs.tabWindows("Safari")
+        --     local numTabs = #tabWins
+        --     hs.alert.show(numTabs)
+
+        --     browser:selectMenuItem(str_menu_item)
+        -- else
+        -- local closing_tab = browser:selectMenuItem({ "File", "Close Tab" })
+        local menu_item2 = browser:findMenuItem({ "File", "Close Tab" })
+        tprint(menu_item2)
+        -- hs.alert.show( menu_item2[-3] )
+        hs.alert.show( menu_item2['enabled']== false )
+
+        -- if (closing_tab) then
+        --     hs.alert.show("Not able to close Tab")
+        --     local numMenuItems =  #browser:getMenuItems()
+        --     -- hs.alert.show( numMenuItems )
+        --     local numWindows = #hs.tabs.tabWindows(browser)
+        --     hs.alert.show( numWindows )
+        --     -- hs.alert.show( hs.window:tabCount() )
+        -- end
+
+
+
+    end
+end
+hs.hotkey.bind({ "cmd"}, "Q", close("Safari"))
+
+
+
 
 --- Open Microsoft Edge New Tab
 function open_NewTab(name)
@@ -74,5 +162,6 @@ hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
 hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
 hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
 hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
+hs.hotkey.bind({ "cmd","⌥"}, "S", open("Safari"))
 -- hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
 
