@@ -1,3 +1,29 @@
+--[[ RESOURCES
+    date: 17th July 2023
+    
+    -- To able to use Apple script
+    hs.osascript.applescript()
+
+    -- Source how to open New Tab Safari next to current
+    https://www.cultofmac.com/691905/how-to-force-safari-tabs-open-at-end-of-tab-bar/
+
+     -- Closes Tab, but depricated due to lag
+     -- Used in function: close()        
+    hs.appfinder.appFromName("Safari"):activate()
+
+    local browser = hs.appfinder.appFromName("Safari")
+    local menu_item = browser:findMenuItem({ "File", "Close Tab" })            
+
+    -- If Close Tab still enabled
+    if (menu_item['enabled'] == false) then
+        browser:selectMenuItem({ "File", "Close Window" })
+    else
+        -- When only one tab remaining, close it 
+        browser:selectMenuItem({ "File", "Close Window" })
+    end
+            
+]]
+
 -- Autoreload Configuration
 function reloadConfig(files)
     doReload = false
@@ -14,107 +40,77 @@ hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
 hs.alert.show("New changes applied")
 
 
---- Safari counter 
--- hs.alert.show( hs.window:tabCount())
-
-
 --- Open App
 function open(name)
     return function()
-        -- hs.application.launchOrFocus(name)
+
+        hs.application.launchOrFocus(name)
         if name == 'Finder' then
             hs.appfinder.appFromName(name):activate()
         end
-        if name == 'Safari' then
-            -- -- local browser = hs.appfinder.appFromName(name)
-            -- hs.application.launchOrFocus(name)
-            -- local focus_window =  hs.window.focusedWindow()
-            -- local focus_window_id = focus_window:id()
-            -- -- browser:activate()
-            -- hs.alert.show(focus_window:title())
-            -- -- hs.alert.show(focus_window_id)
-            -- hs.alert.show(focus_window:tabCount())
 
-            -- opening Tab
-            local browser = hs.appfinder.appFromName(name)
-            browser:activate()
-            local str_menu_item = { "File", "New Tab" }
-            local menu_item = browser:findMenuItem(str_menu_item)
-            if (menu_item) then
-                browser:selectMenuItem(str_menu_item)
-            end
+    end
+end
 
 
-            local focus_window =  hs.window.focusedWindow()
-            local focus_window_id = focus_window:id()
-            hs.alert.show(focus_window_id)
-            hs.alert.show(focus_window:tabCount())
+-- To print Tables
+function tprint (tbl, indent)
+    if not indent then indent = 0 end
+    for k, v in pairs(tbl) do
+        formatting = string.rep("  ", indent) .. k .. ": "
+        if type(v) == "table" then
+        print(formatting)
+        tprint(v, indent+1)
+        elseif type(v) == 'boolean' then
+        print(formatting .. tostring(v))
+        else
+        print(formatting .. v)
+        end
+    end
+end
+
+-- Closes a tab of Safari if able else send close keybinding to system
+function close()
+    return function()
+
+        local focus_window =  hs.window.focusedWindow()
+        local name_app_focus_window = focus_window:application():name()
+
+        -- Only close option for Safari
+        if (name_app_focus_window == "Safari") then
+
+            -- Closes oonly one Tab from Safari
+            hs.osascript.applescript([[
+                tell application "Safari"
+                set tabcount to number of tabs in window 1
+                -- display dialog tabcount
+                if tabcount = 1 then
+                    close window 1
+                else
+                    -- close tab of window 1
+                    tell application "System Events"
+                        tell process "Safari"
+                            -- activate
+                            set frontmost to true
+                            click menu item "Close Tab" of menu "File" of menu bar 1
+                        end tell
+                    end tell
+                end if
+            end tell
+            ]])
+
+        -- For remainder Apps use Cmd+Q
+        else
+            hs.eventtap.keyStroke({"cmd"}, "Q", 0, hs.application.frontmostApplication() )
 
         end
-
     end
 end
-
-
-function close(name)
-    return function()
-
-        function tprint (tbl, indent)
-            if not indent then indent = 0 end
-            for k, v in pairs(tbl) do
-              formatting = string.rep("  ", indent) .. k .. ": "
-              if type(v) == "table" then
-                print(formatting)
-                tprint(v, indent+1)
-              elseif type(v) == 'boolean' then
-                print(formatting .. tostring(v))      
-              else
-                print(formatting .. v)
-              end
-            end
-          end
-
-        local browser = hs.appfinder.appFromName(name)
-        local str_menu_item = { "File", "Close Tab" }
-        local menu_item = { "File", "Close Window" }
-
-        local menu_item = browser:findMenuItem(str_menu_item)
-        -- if (menu_item) then
-        --     hs.alert.show('Here if')
-        --     local tabWins = hs.tabs.tabWindows("Safari")
-        --     local numTabs = #tabWins
-        --     hs.alert.show(numTabs)
-
-        --     browser:selectMenuItem(str_menu_item)
-        -- else
-        -- local closing_tab = browser:selectMenuItem({ "File", "Close Tab" })
-        local menu_item2 = browser:findMenuItem({ "File", "Close Tab" })
-        tprint(menu_item2)
-        -- hs.alert.show( menu_item2[-3] )
-        hs.alert.show( menu_item2['enabled']== false )
-
-        -- if (closing_tab) then
-        --     hs.alert.show("Not able to close Tab")
-        --     local numMenuItems =  #browser:getMenuItems()
-        --     -- hs.alert.show( numMenuItems )
-        --     local numWindows = #hs.tabs.tabWindows(browser)
-        --     hs.alert.show( numWindows )
-        --     -- hs.alert.show( hs.window:tabCount() )
-        -- end
-
-
-
-    end
-end
-hs.hotkey.bind({ "cmd"}, "Q", close("Safari"))
-
-
-
 
 --- Open Microsoft Edge New Tab
-function open_NewTab(name)
+function open_NewTab(webbrowser)
     return function()
-        local browser = hs.appfinder.appFromName(name)
+        local browser = hs.appfinder.appFromName(webbrowser)
         browser:activate()
         local str_menu_item = { "File", "New Tab" }
         local menu_item = browser:findMenuItem(str_menu_item)
@@ -127,9 +123,9 @@ function open_NewTab(name)
 end
 
 --- Open Microsoft Edge New Window
-function open_NewWindow(name)
+function open_NewWindow(webbrowser)
     return function()
-        local browser = hs.appfinder.appFromName(name)
+        local browser = hs.appfinder.appFromName(webbrowser)
         browser:activate()
         local str_menu_item = { "File", "New Window" }
         local menu_item = browser:findMenuItem(str_menu_item)
@@ -148,6 +144,7 @@ end
 
 -- Binding Keys
 local URL = "https://github.com/danilotpnta?tab=repositories"
+hs.hotkey.bind({ "cmd"}, "Q", close())
 hs.hotkey.bind({ "cmd" }, "E", open("Finder"))
 hs.hotkey.bind({ "cmd" }, "Y", open("Youtube"))
 hs.hotkey.bind({ "cmd" }, "T", open("Google Translate"))
@@ -161,7 +158,8 @@ hs.hotkey.bind({ "cmd" }, "K", open("Google Keep"))
 hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
 hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
 hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
-hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
-hs.hotkey.bind({ "cmd","⌥"}, "S", open("Safari"))
+hs.hotkey.bind({ "cmd"}, "X", open_NewTab("Safari"))
+-- hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
 -- hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
+
 
