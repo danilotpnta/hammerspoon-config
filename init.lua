@@ -189,7 +189,7 @@ hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
 hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
 hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
 -- hs.hotkey.bind({ "cmd"}, "X", open_NewTab("Safari"))
-hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
+-- hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
 -- hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
 
 -- hs.hotkey.bind({ "cmd"}, "Q", close())
@@ -229,4 +229,33 @@ end)
 hs.window.filter.new('Safari')
     :subscribe(hs.window.filter.windowFocused,function() close_app:enable() end)
     :subscribe(hs.window.filter.windowUnfocused,function() close_app:disable() end)
+
+
+
+-- bind your hotkeys to shorcut like so:
+open_window_Safari = hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Safari"))
+hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
+
+
+function applicationWatcher(appName, eventType, appObject)
+    if (eventType == hs.application.watcher.activated) then
+        -- if not (appName == "Safari") then
+        --     open_window_Edge:enable()
+        -- end
+        if (appName == "Safari") then
+            open_window_Safari:enable()
+        end
+    end
+    if (eventType == hs.application.watcher.deactivated) then
+        -- if not (appName == "Safari") then
+        --     open_window_Edge:disable()
+        -- end
+        if (appName == "Safari") then
+            open_window_Safari:disable()
+        end
+    end
+end
+
+local appWatcher = hs.application.watcher.new(applicationWatcher)
+appWatcher:start()
 
