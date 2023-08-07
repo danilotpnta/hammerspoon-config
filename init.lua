@@ -21,7 +21,15 @@
         -- When only one tab remaining, close it 
         browser:selectMenuItem({ "File", "Close Window" })
     end
-            
+    
+    -- Docs
+    https://www.hammerspoon.org/docs/hs.eventtap.html#newKeyEvent
+    https://www.hammerspoon.org/docs/hs.hotkey.html#new
+    https://www.hammerspoon.org/docs/hs.eventtap.event.html#newKeyEventSequence
+    https://www.hammerspoon.org/docs/hs.application.html#name
+
+    -- Open Tabs
+    https://zzamboni.org/post/just-enough-lua-to-be-productive-in-hammerspoon-part-2/
 ]]
 
 -- Autoreload Configuration
@@ -79,29 +87,52 @@ function close()
         -- Only close option for Safari
         if (name_app_focus_window == "Safari") then
 
-            -- Closes oonly one Tab from Safari
+            -- Closes only one Tab from Safari
             hs.osascript.applescript([[
                 tell application "Safari"
-                set tabcount to number of tabs in window 1
-                -- display dialog tabcount
-                if tabcount = 1 then
-                    close window 1
-                else
-                    -- close tab of window 1
-                    tell application "System Events"
-                        tell process "Safari"
-                            -- activate
-                            set frontmost to true
-                            click menu item "Close Tab" of menu "File" of menu bar 1
+                    set tabcount to number of tabs in window 1
+                    -- display dialog tabcount
+                    if tabcount = 1 then
+                        close window 1
+                    else
+                        -- close tab of window 1
+                        tell application "System Events"
+                            tell process "Safari"
+                                -- activate
+                                set frontmost to true
+                                click menu item "Close Tab" of menu "File" of menu bar 1
+                            end tell
                         end tell
-                    end tell
-                end if
-            end tell
+                    end if
+                end tell
             ]])
+
 
         -- For remainder Apps use Cmd+Q
         else
-            hs.eventtap.keyStroke({"cmd"}, "Q", 0, hs.application.frontmostApplication() )
+            hs.osascript.applescript([[
+                -- tell application "System Events"
+                --     set activeApp to name of first application process whose frontmost is true
+                --     -- display dialog activeApp
+                --     tell application activeApp 
+                --         tell application "System Events" to keystroke "Q" using command down
+                --         -- keystroke "Q" using command down
+                --     end tell
+                -- end tell
+
+                tell application "System Events"
+                    set activeApp to name of first application process whose frontmost is true
+                end tell
+
+                display dialog activeApp
+                tell application "System Events" to ¬
+                    tell application process activeApp
+                        keystroke "Q" using command down
+                    end tell
+
+            ]])
+
+            -- hs.eventtap.keyStroke({"cmd"}, "Q", 0, hs.application.frontmostApplication() )
 
         end
     end
@@ -144,7 +175,6 @@ end
 
 -- Binding Keys
 local URL = "https://github.com/danilotpnta?tab=repositories"
-hs.hotkey.bind({ "cmd"}, "Q", close())
 hs.hotkey.bind({ "cmd" }, "E", open("Finder"))
 hs.hotkey.bind({ "cmd" }, "Y", open("Youtube"))
 hs.hotkey.bind({ "cmd" }, "T", open("Google Translate"))
@@ -158,8 +188,45 @@ hs.hotkey.bind({ "cmd" }, "K", open("Google Keep"))
 hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
 hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
 hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
-hs.hotkey.bind({ "cmd"}, "X", open_NewTab("Safari"))
--- hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
+-- hs.hotkey.bind({ "cmd"}, "X", open_NewTab("Safari"))
+hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
 -- hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
 
+-- hs.hotkey.bind({ "cmd"}, "Q", close())
+
+-- local focus_window =  hs.window.focusedWindow()
+-- local name_app_focus_window = focus_window:application():name()
+-- hs.alert.show(name_app_focus_window)
+
+-- -- Only close option for Safari
+-- if (name_app_focus_window == "Safari") then
+--     hs.hotkey.bind({ "cmd"}, "Q", close())
+-- end
+
+
+
+close_app = hs.hotkey.new('⌘', 'q', function()
+    hs.osascript.applescript([[
+        tell application "Safari"
+            set tabcount to number of tabs in window 1
+            -- display dialog tabcount
+            if tabcount = 1 then
+                close window 1
+            else
+                -- close tab of window 1
+                tell application "System Events"
+                    tell process "Safari"
+                        -- activate
+                        set frontmost to true
+                        click menu item "Close Tab" of menu "File" of menu bar 1
+                    end tell
+                end tell
+            end if
+        end tell
+    ]])
+end)
+
+hs.window.filter.new('Safari')
+    :subscribe(hs.window.filter.windowFocused,function() close_app:enable() end)
+    :subscribe(hs.window.filter.windowUnfocused,function() close_app:disable() end)
 
