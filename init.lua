@@ -1,6 +1,10 @@
---[[ RESOURCES
-    date: 17th July 2023
-    
+--[[ 
+    ---------- HAMMERSPOON CONFIGURATION ------------
+    Description: A lua approach to speed up your workflow 
+    by: Danilo Toapanta
+
+
+    ---------------- RESOURCES ----------------------
     -- To able to use Apple script
     hs.osascript.applescript()
 
