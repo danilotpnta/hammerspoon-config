@@ -64,19 +64,14 @@ function open(name)
     end
 end
 
-
--- To print Tables
-function tprint (tbl, indent)
-    if not indent then indent = 0 end
-    for k, v in pairs(tbl) do
-        formatting = string.rep("  ", indent) .. k .. ": "
-        if type(v) == "table" then
-        print(formatting)
-        tprint(v, indent+1)
-        elseif type(v) == 'boolean' then
-        print(formatting .. tostring(v))
+--- Close App
+function closeApp(appName)
+    return function()
+        local app = hs.application.find(appName)
+        if app then
+            app:kill()  
         else
-        print(formatting .. v)
+            hs.alert.show(appName .. " is not running")
         end
     end
 end
@@ -171,6 +166,7 @@ function open_NewWindow(webbrowser)
 end
 
 -- Opens URL
+local URL = "https://github.com/danilotpnta?tab=repositories"
 function open_url(URL)
     return function()
         hs.urlevent.openURL(URL)
@@ -178,35 +174,33 @@ function open_url(URL)
 end
 
 -- Binding Keys
-local URL = "https://github.com/danilotpnta?tab=repositories"
-hs.hotkey.bind({ "cmd" }, "E", open("Finder"))
-hs.hotkey.bind({ "cmd" }, "Y", open("Youtube"))
-hs.hotkey.bind({ "cmd" }, "T", open("Google Translate"))
-hs.hotkey.bind({ "cmd","⌥" }, "D", open("Google Docs"))
-hs.hotkey.bind({ "cmd","⌥" }, "S", open("Google Sheets"))
-hs.hotkey.bind({ "cmd" }, "D", open("Google Drive"))
-hs.hotkey.bind({ "cmd" }, "1", open_url(URL))
-hs.hotkey.bind({ "cmd" }, "2", open("Gmail Danilo"))
-hs.hotkey.bind({ "cmd" }, "3", open("Microsoft Outlook"))
-hs.hotkey.bind({ "cmd" }, "K", open("Google Keep"))
-hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
-hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
-hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
+-- hs.hotkey.bind({ "cmd" }, "E", open("Finder"))
+-- hs.hotkey.bind({ "cmd" }, "Y", open("Youtube"))
+-- hs.hotkey.bind({ "cmd" }, "T", open("Google Translate"))
+-- hs.hotkey.bind({ "cmd","⌥" }, "D", open("Google Docs"))
+-- hs.hotkey.bind({ "cmd","⌥" }, "S", open("Google Sheets"))
+-- hs.hotkey.bind({ "cmd" }, "D", open("Google Drive"))
+-- hs.hotkey.bind({ "cmd" }, "1", open_url(URL))
+-- hs.hotkey.bind({ "cmd" }, "2", open("Gmail Danilo"))
+-- hs.hotkey.bind({ "cmd" }, "3", open("Microsoft Outlook"))
+-- hs.hotkey.bind({ "cmd" }, "K", open("Google Keep"))
+-- hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
+-- hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
+-- hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
 -- hs.hotkey.bind({ "cmd"}, "X", open_NewTab("Safari"))
 -- hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
 -- hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
 
--- hs.hotkey.bind({ "cmd"}, "Q", close())
 
 -- local focus_window =  hs.window.focusedWindow()
 -- local name_app_focus_window = focus_window:application():name()
 -- hs.alert.show(name_app_focus_window)
 
--- -- Only close option for Safari
--- if (name_app_focus_window == "Safari") then
---     hs.hotkey.bind({ "cmd"}, "Q", close())
--- end
-
+-- Only close option for Safari
+if (name_app_focus_window == "Safari") then
+    -- hs.hotkey.bind({ "cmd"}, "Q", close())
+    createManagedHotkey({ "cmd"}, "Q", close()):enable()
+end
 
 
 close_app = hs.hotkey.new('⌘', 'q', function()
@@ -235,31 +229,62 @@ hs.window.filter.new('Safari')
     :subscribe(hs.window.filter.windowUnfocused,function() close_app:disable() end)
 
 
+-- Function to create a hotkey with state tracking
+local managedHotkeys = {}
+function createManagedHotkey(mods, key, pressFn)
+    local hk = hs.hotkey.new(mods, key, pressFn)
+    table.insert(managedHotkeys, {hotkey = hk, enabled = false}) -- Initially disabled
+    return hk
+end
 
--- bind your hotkeys to shorcut like so:
-open_window_Safari = hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Safari"))
-hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
+-- Define your hotkeys using the new function
+createManagedHotkey({ "cmd" }, "E", open("Finder")):enable()
+createManagedHotkey({ "cmd" }, "Y", open("Youtube")):enable()
+createManagedHotkey({ "cmd" }, "T", open("Google Translate")):enable()
+createManagedHotkey({ "cmd","⌥" }, "D", open("Google Docs")):enable()
+createManagedHotkey({ "cmd","⌥" }, "S", open("Google Sheets")):enable()
+createManagedHotkey({ "cmd" }, "D", open("Google Drive")):enable()
+createManagedHotkey({ "cmd" }, "1", open_url(URL)):enable()
+createManagedHotkey({ "cmd" }, "2", open("Gmail Danilo")):enable()
+createManagedHotkey({ "cmd" }, "3", open("Microsoft Outlook")):enable()
+createManagedHotkey({ "cmd" }, "K", open("Google Keep")):enable()
+createManagedHotkey({ "cmd" }, "M", open("Google Maps")):enable()
+createManagedHotkey({ "cmd", "option" }, "C", open("Google Calendar")):enable()
+createManagedHotkey({ "cmd" }, "W", open("WhatsApp")):enable()
+createManagedHotkey({ "cmd"}, "X", open_NewTab("Safari")):enable()
+createManagedHotkey({ "cmd" }, "X", open_NewTab("Microsoft Edge")):enable()
 
 
-function applicationWatcher(appName, eventType, appObject)
-    if (eventType == hs.application.watcher.activated) then
-        -- if not (appName == "Safari") then
-        --     open_window_Edge:enable()
-        -- end
-        if (appName == "Safari") then
-            open_window_Safari:enable()
+-- Toggle function to enable/disable all managed hotkeys
+function toggleHotkeys()
+    local anyEnabled = false
+    for _, hk in ipairs(managedHotkeys) do
+        if hk.enabled then
+            anyEnabled = true
+            break
         end
     end
-    if (eventType == hs.application.watcher.deactivated) then
-        -- if not (appName == "Safari") then
-        --     open_window_Edge:disable()
-        -- end
-        if (appName == "Safari") then
-            open_window_Safari:disable()
+
+    if anyEnabled then
+        for _, hk in ipairs(managedHotkeys) do
+            hk.hotkey:disable()
+            hk.enabled = false
         end
+        -- These calls actually execute the functions returned by closeApp and open
+        closeApp("Tiles")()
+        closeApp("BetterTouchTool")()
+        hs.alert.show("Hotkeys Disabled")
+    else
+        for _, hk in ipairs(managedHotkeys) do
+            hk.hotkey:enable()
+            hk.enabled = true
+        end
+        -- These calls actually execute the functions returned by closeApp and open
+        open("Tiles")()
+        open("BetterTouchTool")()
+        hs.alert.show("Hotkeys Enabled")
     end
 end
 
-local appWatcher = hs.application.watcher.new(applicationWatcher)
-appWatcher:start()
-
+-- Bind the toggle function to a shortcut
+hs.hotkey.bind({"cmd", "option", "control"}, "S", toggleHotkeys)
