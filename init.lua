@@ -1,41 +1,3 @@
---[[ 
-    ---------- HAMMERSPOON CONFIGURATION ------------
-    Description: A lua approach to speed up your workflow 
-    by: Danilo Toapanta
-
-
-    ---------------- RESOURCES ----------------------
-    -- To able to use Apple script
-    hs.osascript.applescript()
-
-    -- Source how to open New Tab Safari next to current
-    https://www.cultofmac.com/691905/how-to-force-safari-tabs-open-at-end-of-tab-bar/
-
-     -- Closes Tab, but depricated due to lag
-     -- Used in function: close()        
-    hs.appfinder.appFromName("Safari"):activate()
-
-    local browser = hs.appfinder.appFromName("Safari")
-    local menu_item = browser:findMenuItem({ "File", "Close Tab" })            
-
-    -- If Close Tab still enabled
-    if (menu_item['enabled'] == false) then
-        browser:selectMenuItem({ "File", "Close Window" })
-    else
-        -- When only one tab remaining, close it 
-        browser:selectMenuItem({ "File", "Close Window" })
-    end
-    
-    -- Docs
-    https://www.hammerspoon.org/docs/hs.eventtap.html#newKeyEvent
-    https://www.hammerspoon.org/docs/hs.hotkey.html#new
-    https://www.hammerspoon.org/docs/hs.eventtap.event.html#newKeyEventSequence
-    https://www.hammerspoon.org/docs/hs.application.html#name
-
-    -- Open Tabs
-    https://zzamboni.org/post/just-enough-lua-to-be-productive-in-hammerspoon-part-2/
-]]
-
 -- Autoreload Configuration
 function reloadConfig(files)
     doReload = false
@@ -49,7 +11,7 @@ function reloadConfig(files)
     end
 end
 hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reloadConfig):start()
-hs.alert.show("New changes applied")
+hs.alert.show("🟢 Shortcuts Enabled!")
 
 
 --- Open App
@@ -137,64 +99,38 @@ function close()
     end
 end
 
---- Open Microsoft Edge New Tab
-function open_NewTab(webbrowser)
-    return function()
-        local browser = hs.appfinder.appFromName(webbrowser)
-        browser:activate()
-        local str_menu_item = { "File", "New Tab" }
-        local menu_item = browser:findMenuItem(str_menu_item)
-        if (menu_item) then
-            browser:selectMenuItem(str_menu_item)
-            --hs.alert.show(hs.application.frontmostApplication():name())
-        end
 
-    end
-end
-
---- Open Microsoft Edge New Window
-function open_NewWindow(webbrowser)
+--- Open browser with a new tab
+function open_browser(webbrowser, choice)
     return function()
-        local browser = hs.appfinder.appFromName(webbrowser)
-        browser:activate()
-        local str_menu_item = { "File", "New Window" }
-        local menu_item = browser:findMenuItem(str_menu_item)
-        if (menu_item) then
-            browser:selectMenuItem(str_menu_item)
+        -- Focus or launch the application
+        hs.application.launchOrFocus(webbrowser)
+    
+        -- Get the active browser application
+        local browser = hs.application.find(webbrowser)
+        if browser then
+            local str_menu_item = { "File", choice }
+            local menu_item = browser:findMenuItem(str_menu_item)
+            if menu_item then
+                browser:selectMenuItem(str_menu_item)
+            else
+                hs.alert.show("Menu item not found")
+            end
+        else
+            hs.alert.show(webbrowser .. " is not running")
         end
     end
 end
 
 -- Opens URL
-local URL = "https://github.com/danilotpnta?tab=repositories"
+local URL1 = "https://github.com/danilotpnta-elsevier?tab=repositories"
+local URL1_shift = "https://github.com/danilotpnta?tab=repositories"
 function open_url(URL)
     return function()
         hs.urlevent.openURL(URL)
     end
 end
 
--- Binding Keys
--- hs.hotkey.bind({ "cmd" }, "E", open("Finder"))
--- hs.hotkey.bind({ "cmd" }, "Y", open("Youtube"))
--- hs.hotkey.bind({ "cmd" }, "T", open("Google Translate"))
--- hs.hotkey.bind({ "cmd","⌥" }, "D", open("Google Docs"))
--- hs.hotkey.bind({ "cmd","⌥" }, "S", open("Google Sheets"))
--- hs.hotkey.bind({ "cmd" }, "D", open("Google Drive"))
--- hs.hotkey.bind({ "cmd" }, "1", open_url(URL))
--- hs.hotkey.bind({ "cmd" }, "2", open("Gmail Danilo"))
--- hs.hotkey.bind({ "cmd" }, "3", open("Microsoft Outlook"))
--- hs.hotkey.bind({ "cmd" }, "K", open("Google Keep"))
--- hs.hotkey.bind({ "cmd" }, "M", open("Google Maps"))
--- hs.hotkey.bind({ "cmd", "option" }, "C", open("Google Calendar"))
--- hs.hotkey.bind({ "cmd" }, "W", open("WhatsApp"))
--- hs.hotkey.bind({ "cmd"}, "X", open_NewTab("Safari"))
--- hs.hotkey.bind({ "cmd" }, "X", open_NewTab("Microsoft Edge"))
--- hs.hotkey.bind({ "cmd" }, "X", open_NewWindow("Microsoft Edge"))
-
-
--- local focus_window =  hs.window.focusedWindow()
--- local name_app_focus_window = focus_window:application():name()
--- hs.alert.show(name_app_focus_window)
 
 -- Only close option for Safari
 if (name_app_focus_window == "Safari") then
@@ -241,19 +177,42 @@ end
 createManagedHotkey({ "cmd" }, "E", open("Finder")):enable()
 createManagedHotkey({ "cmd" }, "Y", open("Youtube")):enable()
 createManagedHotkey({ "cmd" }, "T", open("Google Translate")):enable()
-createManagedHotkey({ "cmd","⌥" }, "D", open("Google Docs")):enable()
-createManagedHotkey({ "cmd","⌥" }, "S", open("Google Sheets")):enable()
+createManagedHotkey({ "cmd", "option" }, "D", open("Docs")):enable()
 createManagedHotkey({ "cmd" }, "D", open("Google Drive")):enable()
-createManagedHotkey({ "cmd" }, "1", open_url(URL)):enable()
+createManagedHotkey({ "cmd" }, "1", open_url(URL1)):enable()
+createManagedHotkey({ "cmd", "shift" }, "1", open_url(URL1_shift)):enable()
 createManagedHotkey({ "cmd" }, "2", open("Gmail Danilo")):enable()
 createManagedHotkey({ "cmd" }, "3", open("Microsoft Outlook")):enable()
 createManagedHotkey({ "cmd" }, "K", open("Google Keep")):enable()
 createManagedHotkey({ "cmd" }, "M", open("Google Maps")):enable()
 createManagedHotkey({ "cmd", "option" }, "C", open("Google Calendar")):enable()
 createManagedHotkey({ "cmd" }, "W", open("WhatsApp")):enable()
-createManagedHotkey({ "cmd"}, "X", open_NewTab("Safari")):enable()
-createManagedHotkey({ "cmd" }, "X", open_NewTab("Microsoft Edge")):enable()
+createManagedHotkey({ "cmd", "shift" }, "6", open("Screen Studio")):enable()
+-- createManagedHotkey({ "option"}, "space", open("chatGPT")):enable()
+createManagedHotkey({ "cmd"}, "X", open_browser("Safari", "New Tab")):enable()
+createManagedHotkey({ "cmd" }, "X", open_browser("Microsoft Edge", "New Tab")):enable()
 
+
+-- Function to show the desktop using AppleScript
+function showDesktop()
+    -- hs.osascript.applescript('tell application "System Events" to key code 103')
+end
+
+-- Create an eventtap to capture the Fn key press
+local fnTap = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function(event)
+    local flags = event:getFlags()
+    
+    -- Check if only the Fn key is pressed
+    if flags.fn and not (flags.cmd or flags.alt or flags.shift or flags.ctrl) then
+        showDesktop()
+        return true -- Consume the event
+    end
+    
+    return false -- Pass the event through
+end)
+
+-- Variable to track if showDesktop is enabled
+local showDesktopEnabled = true
 
 -- Toggle function to enable/disable all managed hotkeys
 function toggleHotkeys()
@@ -270,21 +229,27 @@ function toggleHotkeys()
             hk.hotkey:disable()
             hk.enabled = false
         end
-        -- These calls actually execute the functions returned by closeApp and open
         closeApp("Tiles")()
-        closeApp("BetterTouchTool")()
-        hs.alert.show("Hotkeys Disabled")
+        fnTap:stop()  -- Disable showDesktop functionality
+        showDesktopEnabled = false
+        hs.alert.show("🔴 Shortcuts Disabled!")
     else
         for _, hk in ipairs(managedHotkeys) do
             hk.hotkey:enable()
             hk.enabled = true
         end
-        -- These calls actually execute the functions returned by closeApp and open
-        open("Tiles")()
-        open("BetterTouchTool")()
-        hs.alert.show("Hotkeys Enabled")
+        -- Launch Tiles app in the background
+        hs.execute("/usr/bin/open -g -j -a Tiles", true)
+        fnTap:start()  -- Enable showDesktop functionality
+        showDesktopEnabled = true
+        hs.alert.show("🟢 Shortcuts Enabled!")
     end
 end
 
 -- Bind the toggle function to a shortcut
 hs.hotkey.bind({"cmd", "option", "control"}, "S", toggleHotkeys)
+
+-- Initially start the fnTap if you want it enabled by default
+if showDesktopEnabled then
+    fnTap:start()
+end
