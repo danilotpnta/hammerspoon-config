@@ -123,7 +123,7 @@ function open_browser(webbrowser, choice)
 end
 
 -- Opens URL
-local URL1 = "https://github.com/danilotpnta-elsevier?tab=repositories"
+local URL1 = "https://github.com/elsevier-research/ds-agentic-topic-pages-gen"
 local URL1_shift = "https://github.com/danilotpnta?tab=repositories"
 function open_url(URL)
     return function()
