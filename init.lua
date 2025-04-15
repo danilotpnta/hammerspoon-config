@@ -173,6 +173,45 @@ function createManagedHotkey(mods, key, pressFn)
     return hk
 end
 
+-- Table to store the last active window of specific applications
+local lastWindow = {}
+
+-- Function to toggle an app: focus it if not frontmost, or hide it if it is, while remembering its last window.
+function toggleAndRememberApp(appName)
+    return function()
+        local app = hs.application.find(appName)
+        if app and app:isFrontmost() then
+            -- If the app is frontmost, store its focused window and hide the app.
+            local currentWin = hs.window.focusedWindow()
+            if currentWin and currentWin:application():name() == appName then
+                lastWindow[appName] = currentWin
+            end
+            app:hide()
+        else
+            -- Launch or focus the app.
+            hs.application.launchOrFocus(appName)
+            -- After a short delay, try to re-focus the last window for this app if available.
+            hs.timer.doAfter(0.5, function()
+                local storedWin = lastWindow[appName]
+                if storedWin and storedWin:isValid() and storedWin:isVisible() then
+                    storedWin:focus()
+                end
+            end)
+        end
+    end
+end
+
+-- Set up a window filter for "chatGPT Edge" to record the last active window whenever one is focused.
+local chatGPTEdgeFilter = hs.window.filter.new("chatGPT Edge")
+chatGPTEdgeFilter:subscribe(hs.window.filter.windowFocused, function(win)
+    lastWindow["chatGPT Edge"] = win
+end)
+
+-- Bind the toggle function to Option+Command+Space for "chatGPT Edge"
+createManagedHotkey({ "option"}, "space", toggleAndRememberApp("chatGPT Edge")):enable()
+createManagedHotkey({ "cmd", "option"}, "space", toggleAndRememberApp("Claude")):enable()
+
+
 -- Define your hotkeys using the new function
 createManagedHotkey({ "cmd" }, "E", open("Finder")):enable()
 createManagedHotkey({ "cmd" }, "Y", open("Youtube")):enable()
@@ -188,7 +227,8 @@ createManagedHotkey({ "cmd" }, "M", open("Google Maps")):enable()
 createManagedHotkey({ "cmd", "option" }, "C", open("Google Calendar")):enable()
 createManagedHotkey({ "cmd" }, "W", open("WhatsApp")):enable()
 createManagedHotkey({ "cmd", "shift" }, "6", open("Screen Studio")):enable()
--- createManagedHotkey({ "option"}, "space", open("chatGPT")):enable()
+-- createManagedHotkey({ "option"}, "space", open("chatGPT Edge")):enable()
+-- createManagedHotkey({ "shift", "option"}, "space", open("Claude")):enable()
 createManagedHotkey({ "cmd"}, "X", open_browser("Safari", "New Tab")):enable()
 createManagedHotkey({ "cmd" }, "X", open_browser("Microsoft Edge", "New Tab")):enable()
 
