@@ -201,14 +201,14 @@ function toggleAndRememberApp(appName)
     end
 end
 
--- Set up a window filter for "chatGPT Edge" to record the last active window whenever one is focused.
-local chatGPTEdgeFilter = hs.window.filter.new("chatGPT Edge")
+-- Set up a window filter for "ChatGPT Edge" to record the last active window whenever one is focused.
+local chatGPTEdgeFilter = hs.window.filter.new("ChatGPT Edge")
 chatGPTEdgeFilter:subscribe(hs.window.filter.windowFocused, function(win)
-    lastWindow["chatGPT Edge"] = win
+    lastWindow["ChatGPT Edge"] = win
 end)
 
--- Bind the toggle function to Option+Command+Space for "chatGPT Edge"
-createManagedHotkey({ "option"}, "space", toggleAndRememberApp("chatGPT Edge")):enable()
+-- Bind the toggle function to Option+Command+Space for "ChatGPT Edge"
+createManagedHotkey({ "option"}, "space", toggleAndRememberApp("ChatGPT Edge")):enable()
 createManagedHotkey({ "cmd", "option"}, "space", toggleAndRememberApp("Claude")):enable()
 
 
@@ -227,7 +227,7 @@ createManagedHotkey({ "cmd" }, "M", open("Google Maps")):enable()
 createManagedHotkey({ "cmd", "option" }, "C", open("Google Calendar")):enable()
 createManagedHotkey({ "cmd" }, "W", open("WhatsApp")):enable()
 createManagedHotkey({ "cmd", "shift" }, "6", open("Screen Studio")):enable()
--- createManagedHotkey({ "option"}, "space", open("chatGPT Edge")):enable()
+-- createManagedHotkey({ "option"}, "space", open("ChatGPT Edge")):enable()
 -- createManagedHotkey({ "shift", "option"}, "space", open("Claude")):enable()
 createManagedHotkey({ "cmd"}, "X", open_browser("Safari", "New Tab")):enable()
 createManagedHotkey({ "cmd" }, "X", open_browser("Microsoft Edge", "New Tab")):enable()
