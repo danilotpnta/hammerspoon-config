@@ -123,8 +123,7 @@ function open_browser(webbrowser, choice)
 end
 
 -- Opens URL
-local URL1 = "https://github.com/elsevier-research/ds-agentic-topic-pages-gen"
-local URL1_shift = "https://github.com/danilotpnta?tab=repositories"
+local URL1 = "https://github.com/danilotpnta?tab=repositories"
 function open_url(URL)
     return function()
         hs.urlevent.openURL(URL)
@@ -207,52 +206,28 @@ chatGPTEdgeFilter:subscribe(hs.window.filter.windowFocused, function(win)
     lastWindow["ChatGPT Edge"] = win
 end)
 
--- Bind the toggle function to Option+Command+Space for "ChatGPT Edge"
-createManagedHotkey({ "option"}, "space", toggleAndRememberApp("ChatGPT Edge")):enable()
-createManagedHotkey({ "cmd", "option"}, "space", toggleAndRememberApp("Claude")):enable()
-
 
 -- Define your hotkeys using the new function
+createManagedHotkey({ "cmd" }, "2", open("Gmail")):enable()
 createManagedHotkey({ "cmd" }, "E", open("Finder")):enable()
-createManagedHotkey({ "cmd" }, "Y", open("Youtube")):enable()
-createManagedHotkey({ "cmd" }, "T", open("Google Translate")):enable()
-createManagedHotkey({ "cmd", "option" }, "D", open("Docs")):enable()
-createManagedHotkey({ "cmd" }, "D", open("Google Drive")):enable()
 createManagedHotkey({ "cmd" }, "1", open_url(URL1)):enable()
-createManagedHotkey({ "cmd", "shift" }, "1", open_url(URL1_shift)):enable()
-createManagedHotkey({ "cmd" }, "2", open("Gmail Danilo")):enable()
-createManagedHotkey({ "cmd" }, "3", open("Microsoft Outlook")):enable()
+createManagedHotkey({ "cmd" }, "Y", open("Youtube")):enable()
+createManagedHotkey({ "cmd" }, "W", open("WhatsApp")):enable()
 createManagedHotkey({ "cmd" }, "K", open("Google Keep")):enable()
 createManagedHotkey({ "cmd" }, "M", open("Google Maps")):enable()
+createManagedHotkey({ "cmd" }, "D", open("Google Drive")):enable()
+createManagedHotkey({ "cmd" }, "T", open("Google Translate")):enable()
+createManagedHotkey({ "cmd" }, "3", open("Microsoft Outlook")):enable()
+createManagedHotkey({ "cmd", "option" }, "D", open("Docs")):enable()
 createManagedHotkey({ "cmd", "option" }, "C", open("Google Calendar")):enable()
-createManagedHotkey({ "cmd" }, "W", open("WhatsApp")):enable()
-createManagedHotkey({ "cmd", "shift" }, "6", open("Screen Studio")):enable()
+
 -- createManagedHotkey({ "option"}, "space", open("ChatGPT Edge")):enable()
 -- createManagedHotkey({ "shift", "option"}, "space", open("Claude")):enable()
+createManagedHotkey({ "option"}, "space", toggleAndRememberApp("ChatGPT Edge")):enable()
+createManagedHotkey({ "cmd", "option"}, "space", toggleAndRememberApp("Claude")):enable()
 createManagedHotkey({ "cmd"}, "X", open_browser("Safari", "New Tab")):enable()
 createManagedHotkey({ "cmd" }, "X", open_browser("Microsoft Edge", "New Tab")):enable()
 
-
--- Function to show the desktop using AppleScript
-function showDesktop()
-    -- hs.osascript.applescript('tell application "System Events" to key code 103')
-end
-
--- Create an eventtap to capture the Fn key press
-local fnTap = hs.eventtap.new({hs.eventtap.event.types.flagsChanged}, function(event)
-    local flags = event:getFlags()
-    
-    -- Check if only the Fn key is pressed
-    if flags.fn and not (flags.cmd or flags.alt or flags.shift or flags.ctrl) then
-        showDesktop()
-        return true -- Consume the event
-    end
-    
-    return false -- Pass the event through
-end)
-
--- Variable to track if showDesktop is enabled
-local showDesktopEnabled = true
 
 -- Toggle function to enable/disable all managed hotkeys
 function toggleHotkeys()
