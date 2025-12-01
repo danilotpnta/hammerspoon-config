@@ -309,7 +309,7 @@ local function enableBarrier()
         end)
         
         eventTap:start()
-        hs.alert.show("Cooldown barrier enabled", 1)
+        hs.alert.show("Barrier enabled", 1)
     end
 end
 
