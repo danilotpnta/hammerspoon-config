@@ -261,89 +261,7 @@ end
 hs.hotkey.bind({"cmd", "option", "control"}, "S", toggleHotkeys)
 
 
----- USE THIS ONE
-
--- local screenSharingAppName = "Screen Sharing"
--- local eventTap = nil
--- local barrierHeight = 38
-
--- local function enableBarrier()
---     if not eventTap then
---         eventTap = hs.eventtap.new({
---             hs.eventtap.event.types.mouseMoved,
---             hs.eventtap.event.types.leftMouseDragged,
---             hs.eventtap.event.types.rightMouseDragged
---         }, function(event)
---             local app = hs.application.frontmostApplication()
---             if app and app:name() == screenSharingAppName then
---                 local win = app:focusedWindow()
---                 if win and win:isFullScreen() then
---                     local currentPos = hs.mouse.absolutePosition()
---                     local screen = hs.mouse.getCurrentScreen()
---                     local screenFrame = screen:fullFrame()
---                     local topBarrier = screenFrame.y + barrierHeight
-                    
---                     local dy = event:getProperty(hs.eventtap.event.properties.mouseEventDeltaY)
---                     local targetY = currentPos.y + dy
-                    
---                     -- Only block if crossing barrier going up
---                     if currentPos.y >= topBarrier and targetY < topBarrier and dy < 0 then
---                         hs.mouse.absolutePosition({
---                             x = currentPos.x,
---                             y = topBarrier
---                         })
---                         return true
---                     end
---                 end
---             end
---             return false
---         end)
-        
---         eventTap:start()
---         hs.alert.show("Minimal barrier enabled", 1)
---     end
--- end
-
--- local function disableBarrier()
---     if eventTap then
---         eventTap:stop()
---         eventTap = nil
---         hs.alert.show("Barrier disabled", 1)
---     end
--- end
-
--- appWatcher = hs.application.watcher.new(function(appName, eventType, appObject)
---     if appName == screenSharingAppName then
---         if eventType == hs.application.watcher.activated then
---             hs.timer.doAfter(0.1, enableBarrier)
---         elseif eventType == hs.application.watcher.deactivated then
---             disableBarrier()
---         end
---     end
--- end)
-
--- appWatcher:start()
-
--- local app = hs.application.get(screenSharingAppName)
--- if app and app:isFrontmost() then
---     enableBarrier()
--- end
-
--- hs.hotkey.bind({"cmd", "shift"}, "up", function()
---     barrierHeight = math.min(barrierHeight + 10, 200)
---     hs.alert.show("Barrier: " .. barrierHeight .. "px", 0.5)
--- end)
-
--- hs.hotkey.bind({"cmd", "shift"}, "down", function()
---     barrierHeight = math.max(barrierHeight - 10, 20)
---     hs.alert.show("Barrier: " .. barrierHeight .. "px", 0.5)
--- end)
-
--- hs.notify.new({title="Hammerspoon", informativeText="Minimal barrier loaded"}):send()
-
-
-
---- FINAL VERSION
+--- Border Barrier Blocking for Screen Sharing App
 local screenSharingAppName = "Screen Sharing"
 local eventTap = nil
 local barrierHeight = 38
@@ -419,26 +337,3 @@ local app = hs.application.get(screenSharingAppName)
 if app and app:isFrontmost() then
     enableBarrier()
 end
-
-hs.hotkey.bind({"cmd", "shift"}, "up", function()
-    barrierHeight = math.min(barrierHeight + 10, 200)
-    hs.alert.show("Barrier: " .. barrierHeight .. "px", 0.5)
-end)
-
-hs.hotkey.bind({"cmd", "shift"}, "down", function()
-    barrierHeight = math.max(barrierHeight - 10, 20)
-    hs.alert.show("Barrier: " .. barrierHeight .. "px", 0.5)
-end)
-
--- Adjust cooldown time
-hs.hotkey.bind({"cmd", "shift"}, "right", function()
-    blockCooldown = math.min(blockCooldown + 0.05, 1.0)
-    hs.alert.show("Cooldown: " .. string.format("%.2f", blockCooldown) .. "s", 0.5)
-end)
-
-hs.hotkey.bind({"cmd", "shift"}, "left", function()
-    blockCooldown = math.max(blockCooldown - 0.05, 0.05)
-    hs.alert.show("Cooldown: " .. string.format("%.2f", blockCooldown) .. "s", 0.5)
-end)
-
-hs.notify.new({title="Hammerspoon", informativeText="Cooldown barrier loaded"}):send()
