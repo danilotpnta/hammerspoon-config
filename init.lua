@@ -317,7 +317,7 @@ local function disableBarrier()
     if eventTap then
         eventTap:stop()
         eventTap = nil
-        hs.alert.show("Barrier disabled", 1)
+        -- hs.alert.show("Barrier disabled", 1)
     end
 end
 
